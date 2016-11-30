@@ -413,6 +413,12 @@ class Log implements \Utill\MQ\ImessagePublisher
          * set thrown exceptions to rabbitMQ message queue
          * @author Zeynel Dağlı
          */
+         /**
+         * slim_codebase was turned off during work.
+         * When to use rabbitmq will be opened
+         * @author Okan CIRAN
+         * @since 30.11.2016
+         */
 //        if($this->exceptionsQueue) $this->publishMessage ($object);
         
         if (!isset(self::$levels[$level])) {

@@ -70,6 +70,12 @@ class PrettyExceptions extends \Slim\Middleware implements \Utill\MQ\ImessagePub
             //print_r('--pretty exceptions call()--');
             //
             // publis exception on message queue
+        /**
+         * slim_codebase was turned off during work.
+         * When to use rabbitmq will be opened
+         * @author Okan CIRAN
+         * @since 30.11.2016
+         */
          //   $this->publishMessage($e);
             
             $log = $this->app->getLog(); // Force Slim to append log to env if not already

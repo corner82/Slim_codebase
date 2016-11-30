@@ -148,17 +148,35 @@ use PhpAmqpLib\Message\AMQPMessage;
         $serviceManager = $this->app->getServiceManager();
         if($this->requestHeaderData['X-Updateoperationlogged'] == 'true') {
           //print_r('--testt1--');
-    //      $this->controlUpdate();
+         /**
+         * slim_codebase was turned off during work.
+         * When to use rabbitmq will be opened
+         * @author Okan CIRAN
+         * @since 30.11.2016
+         */
+        //   $this->controlUpdate();
         }
         
         if($this->requestHeaderData['X-Insertoperationlogged'] == 'true') {
           //print_r('--testt2--');
-    //      $this->controlInsert();
+         /**
+         * slim_codebase was turned off during work.
+         * When to use rabbitmq will be opened
+         * @author Okan CIRAN
+         * @since 30.11.2016
+         */
+        //    $this->controlInsert();
         }
         
         if($this->requestHeaderData['X-Deleteoperationlogged'] == 'true') {
           //print_r('--testt3--');
-    //      $this->controlDelete();
+        /**
+         * slim_codebase was turned off during work.
+         * When to use rabbitmq will be opened
+         * @author Okan CIRAN
+         * @since 30.11.2016
+         */
+        //      $this->controlDelete();
         }
 
         $this->next->call();
