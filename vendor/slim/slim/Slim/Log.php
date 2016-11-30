@@ -413,7 +413,7 @@ class Log implements \Utill\MQ\ImessagePublisher
          * set thrown exceptions to rabbitMQ message queue
          * @author Zeynel Dağlı
          */
-        if($this->exceptionsQueue) $this->publishMessage ($object);
+//        if($this->exceptionsQueue) $this->publishMessage ($object);
         
         if (!isset(self::$levels[$level])) {
             throw new \InvalidArgumentException('Invalid log level supplied to function');

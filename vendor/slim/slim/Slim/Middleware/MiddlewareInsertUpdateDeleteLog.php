@@ -148,17 +148,17 @@ use PhpAmqpLib\Message\AMQPMessage;
         $serviceManager = $this->app->getServiceManager();
         if($this->requestHeaderData['X-Updateoperationlogged'] == 'true') {
           //print_r('--testt1--');
-          $this->controlUpdate();
+    //      $this->controlUpdate();
         }
         
         if($this->requestHeaderData['X-Insertoperationlogged'] == 'true') {
           //print_r('--testt2--');
-          $this->controlInsert();
+    //      $this->controlInsert();
         }
         
         if($this->requestHeaderData['X-Deleteoperationlogged'] == 'true') {
           //print_r('--testt3--');
-          $this->controlDelete();
+    //      $this->controlDelete();
         }
 
         $this->next->call();

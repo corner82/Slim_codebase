@@ -202,7 +202,7 @@ use PhpAmqpLib\Message\AMQPMessage;
         
         if($this->hmacObj->getHash() != $this->getRequestHeaderData()['X-Hash'])  {
             //print_r ('-----hash eşit değil----');
-            $this->publishMessage();
+        //    $this->publishMessage();
             $hashNotMatchForwarder = new \Utill\Forwarder\hashNotMatchForwarder();
             $hashNotMatchForwarder->redirect();
             
@@ -241,7 +241,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
         if($this->hmacObj->getHash() != $this->getRequestHeaderData()['X-Hash-Temp'])  {
             //print_r ('-----hash eşit değil----');
-            $this->publishMessage();
+        //    $this->publishMessage();
             $hashNotMatchForwarder = new \Utill\Forwarder\hashNotMatchForwarder();
             $hashNotMatchForwarder->redirect();
             

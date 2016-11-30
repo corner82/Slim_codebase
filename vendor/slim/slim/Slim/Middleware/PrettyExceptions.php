@@ -70,7 +70,7 @@ class PrettyExceptions extends \Slim\Middleware implements \Utill\MQ\ImessagePub
             //print_r('--pretty exceptions call()--');
             //
             // publis exception on message queue
-            $this->publishMessage($e);
+         //   $this->publishMessage($e);
             
             $log = $this->app->getLog(); // Force Slim to append log to env if not already
             $env = $this->app->environment();
