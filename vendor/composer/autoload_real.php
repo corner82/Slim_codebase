@@ -44,6 +44,16 @@ class ComposerAutoloaderInitb5698824169a0b637d3041f71a6c1ca2
         foreach ($includeFiles as $file) {
             composerRequireb5698824169a0b637d3041f71a6c1ca2($file);
         }
+        
+        /**
+         * When you use 'doctrine' ORM framework (We think to use for annotations),
+         * you should syncronize doctrine auto loading process with composer's auto loading mechanisim
+         * @author Mustafa Zeynel Dağlı
+         * @since 24/02/2017
+         * @todo Uncomment load registery block below for doctrine when loaded by composer
+         */
+        /*\Doctrine\Common\Annotations\AnnotationRegistry::registerFile( dirname( __DIR__ ).'/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php' );
+        \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader([$loader, 'loadClass']);*/
 
         return $loader;
     }
