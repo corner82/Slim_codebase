@@ -94,6 +94,12 @@ class BLLManagerConfig{
                 'sysOperationTypesRrpBLL' => 'BLL\BLL\SysOperationTypesRrp',
                 'actProcessConfirmBLL' => 'BLL\BLL\ActProcessConfirm',
                  
+                'actUsersActionStatisticsBLL' => 'BLL\BLL\ActUsersActionStatistics',
+                'sysNotificationRestservicesBLL' => 'BLL\BLL\SysNotificationRestservices',
+                'sysSectorsBLL' => 'BLL\BLL\SysSectors',
+                 
+                 
+                 
              ),
              'factories' => [
                  //'reportConfigurationPDO' => 'BLL\BLL\ReportConfiguration',

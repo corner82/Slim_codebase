@@ -325,39 +325,15 @@ $app->get("/pkFillMenuTypeListGrid_sysMenuTypes/", function () use ($app ) {
     if (!isset($headerParams['X-Public'])) {
         throw new Exception('rest api "pkFillMenuTypeListGrid_sysMenuTypes" end point, X-Public variable not found');
     }
-  //  $pk = $headerParams['X-Public'];
-
-    $vName = NULL;
-    if (isset($_GET['name'])) {
-        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
-                $app, $_GET['name']));
-    }     
-    $vNameEng = NULL;
-    if (isset($_GET['name_eng'])) {
-        $stripper->offsetSet('name_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
-                $app, $_GET['name_eng']));
-    }     
-    $vDescription = '';
-    if (isset($_GET['description'])) {
-        $stripper->offsetSet('description', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
-                $app, $_GET['description']));
-    }
-    $vDescriptionEng = '';
-    if (isset($_GET['description_eng'])) {
-        $stripper->offsetSet('description_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
-                $app, $_GET['description_eng']));
-    }  
-    $vActive = NULL;
-    if (isset($_GET['active'])) {
-        $stripper->offsetSet('active', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
-                $app, $_GET['active']));
-    }
-    $vOpUserName = NULL;
-    if (isset($_GET['op_user_name'])) {
-        $stripper->offsetSet('op_user_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
-                $app, $_GET['op_user_name']));
-    }
+   // $pk = $headerParams['X-Public'];
     
+    $vLanguageCode = 'tr';
+    if (isset($_GET['language_code'])) {
+         $stripper->offsetSet('language_code',$stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE,
+                                                $app,
+                                                $_GET['language_code']));
+    }   
+                        
     $vPage = NULL;
     if (isset($_GET['page'])) {
         $stripper->offsetSet('page', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
@@ -377,34 +353,94 @@ $app->get("/pkFillMenuTypeListGrid_sysMenuTypes/", function () use ($app ) {
     if (isset($_GET['order'])) {
         $stripper->offsetSet('order', $stripChainerFactory->get(stripChainers::FILTER_ONLY_ORDER, 
                 $app, $_GET['order']));
-    }
-    $filterRules = null;
-    if (isset($_GET['filterRules'])) {
-        $stripper->offsetSet('filterRules', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_JASON_LVL1, 
-                $app, $_GET['filterRules']));
-    }
-
+    } 
+     ///////////////////////////////////////////////////////////// 
+    $rname = NULL;
+    $rnameEng = NULL;
+    $rdescription = NULL;
+    $rdescriptionEng = NULL;
+   // $rstateActive = NULL;
+    $ropUserName = NULL;
+    $rlanguageName = NULL;
+     if (isset($_GET['filterRules'])) {
+            $filterRules = trim($_GET['filterRules']);
+            $jsonFilter = json_decode($filterRules, true);             
+            foreach ($jsonFilter as $std) {
+                if ($std['value'] != null) {
+                    switch (trim($std['field'])) {
+                        case 'name':                            
+                            $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'name_eng':
+                            $stripper->offsetSet('name_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'description':
+                            $stripper->offsetSet('description', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));                            
+                            break;
+                        case 'description_eng':
+                            $stripper->offsetSet('description_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                 //       case 'state_active':
+                   //         $stripper->offsetSet('state_active', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                  //          break;
+                        case 'op_user_name':
+                            $stripper->offsetSet('op_user_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'language_name':
+                            $stripper->offsetSet('language_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;                        
+                        default:
+                            break;
+                    }
+                }
+            }
+        }            
+    ////////////////////////////////////////////////////////////
+  
     $stripper->strip(); 
-    if ($stripper->offsetExists('name')) {
-        $vName = $stripper->offsetGet('name')->getFilterValue();
-    }
-    if ($stripper->offsetExists('name_eng')) {
-        $vNameEng = $stripper->offsetGet('name_eng')->getFilterValue();
-    }
-    if ($stripper->offsetExists('description')) {
-        $vDescription = $stripper->offsetGet('description')->getFilterValue();
-    } 
-    if ($stripper->offsetExists('description_eng')) {
-        $vDescriptionEng = $stripper->offsetGet('description_eng')->getFilterValue();
-    }          
-    if ($stripper->offsetExists('active')) {
-        $vActive = $stripper->offsetGet('active')->getFilterValue();
-    } 
-    if ($stripper->offsetExists('op_user_name')) {
-        $vOpUserName = $stripper->offsetGet('op_user_name')->getFilterValue();
-    }
     
-    
+    if (isset($_GET['filterRules'])) {
+            $filterRules = trim($_GET['filterRules']);
+            $jsonFilter = json_decode($filterRules, true);             
+            $addfilterRules = NULL;
+            $filterRules = NULL;
+            foreach ($jsonFilter as $std) {
+                if ($std['value'] != NULL) {                    
+                    switch (trim($std['field'])) {
+                        case 'name':                            
+                                $rname = $stripper->offsetGet('name')->getFilterValue();                    
+                            break;
+                        case 'name_eng':
+                                $rnameEng = $stripper->offsetGet('name_eng')->getFilterValue();
+                            break;
+                        case 'description':
+                                $rdescription = $stripper->offsetGet('description')->getFilterValue();                            
+                            break;
+                        case 'description_eng':
+                                $rdescriptionEng = $stripper->offsetGet('description_eng')->getFilterValue();
+                            break;
+                  //      case 'state_active':
+                   //             $rstateActive = $stripper->offsetGet('state_active')->getFilterValue();                            
+                  //          break;
+                        case 'op_user_name':
+                                $ropUserName = $stripper->offsetGet('op_user_name')->getFilterValue();                            
+                            break; 
+                        case 'language_name':
+                                $rlanguageName = $stripper->offsetGet('language_name')->getFilterValue();                            
+                            break;     
+                        default:
+                            break;
+                    }
+                   
+                   
+                }
+            }
+        } 
+      
+                        
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }                        
     if ($stripper->offsetExists('page')) {
         $vPage = $stripper->offsetGet('page')->getFilterValue();
     }
@@ -416,32 +452,34 @@ $app->get("/pkFillMenuTypeListGrid_sysMenuTypes/", function () use ($app ) {
     }
     if ($stripper->offsetExists('order')) {
         $vOrder = $stripper->offsetGet('order')->getFilterValue();
-    }
-    if ($stripper->offsetExists('filterRules')) {
-        $filterRules = $stripper->offsetGet('filterRules')->getFilterValue();
-    }
+    }   
     
-    $resDataGrid = $BLL->fillMenuTypeListGrid(array(        
+    $resDataGrid = $BLL->fillMenuTypeListGrid(array(
+        'language_code' => $vLanguageCode, 
         'page' => $vPage,
         'rows' => $vRows,
         'sort' => $vSort,
         'order' => $vOrder,
-        'name' => $vName,
-        'name_eng' => $vNameEng,
-        'description' => $vDescription,        
-        'description_eng' => $vDescriptionEng,
-        'active' => $vActive,       
-        'op_user_name' => $vOpUserName,        
-        'filterRules' => $filterRules,
+                        
+        // 'filterRules' => $filterRules,
+        'fr_name' => $rname,
+        'fr_name_eng' => $rnameEng,
+        'fr_op_user_name' => $ropUserName,        
+        'fr_description' => $rdescription,
+        'fr_description_eng' => $rdescriptionEng,
+      //  'fr_state_active' => $rstateActive,
+        'fr_language_name' => $rlanguageName,        
     ));
     $resTotalRowCount = $BLL->fillMenuTypeListGridRtc(array(
-        'name' => $vName,
-        'name_eng' => $vNameEng,
-        'description' => $vDescription,        
-        'description_eng' => $vDescriptionEng,
-        'active' => $vActive,       
-        'op_user_name' => $vOpUserName,        
-        'filterRules' => $filterRules,
+        'language_code' => $vLanguageCode,                 
+        // 'filterRules' => $filterRules,
+        'fr_name' => $rname,
+        'fr_name_eng' => $rnameEng,
+        'fr_op_user_name' => $ropUserName,        
+        'fr_description' => $rdescription,
+        'fr_description_eng' => $rdescriptionEng,
+      //  'fr_state_active' => $rstateActive,
+        'fr_language_name' => $rlanguageName,        
     ));
     $counts = 0;
     $flows = array();

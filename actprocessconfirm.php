@@ -55,7 +55,13 @@ $app->get("/pkGetConsultantJobs_actProcessConfirm/", function () use ($app ) {
     if (!isset($headerParams['X-Public'])) {
         throw new Exception('rest api "pkGetConsultantJobs_actProcessConfirm" end point, X-Public variable not found');
     }
-    $pk = $headerParams['X-Public'];    
+    $pk = $headerParams['X-Public'];  
+    $vLanguageCode = 'tr';
+    if (isset($_GET['language_code'])) {
+         $stripper->offsetSet('language_code',$stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE,
+                                                $app,
+                                                $_GET['language_code']));
+    }            
     $vPage = NULL;
     if (isset($_GET['page'])) {
         $stripper->offsetSet('page', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
@@ -76,13 +82,150 @@ $app->get("/pkGetConsultantJobs_actProcessConfirm/", function () use ($app ) {
         $stripper->offsetSet('order', $stripChainerFactory->get(stripChainers::FILTER_ONLY_ORDER, 
                 $app, $_GET['order']));
     }
-    $filterRules = null;
-    if (isset($_GET['filterRules'])) {
-        $stripper->offsetSet('filterRules', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_JASON_LVL1, 
-                $app, $_GET['filterRules']));
-    }
-
-    $stripper->strip();      
+    
+    ///////////////////////////////////////////////////////////// 
+    $roperationName = NULL;
+    $roperationNameEng = NULL;
+    $rcategory = NULL;
+    $rcategoryEng = NULL;
+    $rtableName = NULL;
+    $rmembershipTypesName = NULL;
+    $rmembershipTypesNameEng = NULL;    
+    $rperiodName = NULL;
+    $rperiodNameEng = NULL;
+    $rpreferredLanguage = NULL;
+    $ropUserName = NULL;
+    $rconsName = NULL;
+    $ropConsName = NULL;
+    $rconsOperationName = NULL;
+    $rconsOperationNameEng = NULL;
+    
+     if (isset($_GET['filterRules'])) {
+            $filterRules = trim($_GET['filterRules']);
+            $jsonFilter = json_decode($filterRules, true);             
+            foreach ($jsonFilter as $std) {
+                if ($std['value'] != null) {
+                    switch (trim($std['field'])) {
+                        case 'operation_name':                            
+                            $stripper->offsetSet('operation_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'operation_name_eng':
+                            $stripper->offsetSet('operation_name_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'category':
+                            $stripper->offsetSet('category', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));                            
+                            break;
+                        case 'category_eng':
+                            $stripper->offsetSet('category_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'table_name':
+                            $stripper->offsetSet('table_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'membership_types_name':
+                            $stripper->offsetSet('membership_types_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'membership_types_name_eng':
+                            $stripper->offsetSet('membership_types_name_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;     
+                        case 'period_name':
+                            $stripper->offsetSet('period_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;   
+                        case 'period_name_eng':
+                            $stripper->offsetSet('period_name_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;   
+                        case 'preferred_language':
+                            $stripper->offsetSet('preferred_language', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break; 
+                        case 'cons_name':
+                            $stripper->offsetSet('cons_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;  
+                        case 'op_user_name':
+                            $stripper->offsetSet('op_user_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;  
+                        case 'op_cons_name':
+                            $stripper->offsetSet('op_cons_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;  
+                        case 'cons_operation_name':
+                            $stripper->offsetSet('cons_operation_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;  
+                         case 'cons_operation_name_eng':
+                            $stripper->offsetSet('cons_operation_name_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break; 
+                        default:
+                            break;
+                    }
+                }
+            }
+        }            
+    ////////////////////////////////////////////////////////////
+    
+    $stripper->strip();  
+    
+       if (isset($_GET['filterRules'])) {
+            $filterRules = trim($_GET['filterRules']);
+            $jsonFilter = json_decode($filterRules, true);             
+            $addfilterRules = NULL;
+            $filterRules = NULL;
+            foreach ($jsonFilter as $std) {
+                if ($std['value'] != NULL) {                    
+                    switch (trim($std['field'])) {
+                        case 'operation_name':                            
+                                $roperationName = $stripper->offsetGet('operation_name')->getFilterValue();                    
+                            break;
+                        case 'operation_name_eng':
+                                $roperationNameEng = $stripper->offsetGet('operation_name_eng')->getFilterValue();
+                            break;
+                        case 'category':
+                                $rcategory = $stripper->offsetGet('category')->getFilterValue();                            
+                            break;
+                        case 'category_eng':
+                                $rcategoryEng = $stripper->offsetGet('category_eng')->getFilterValue();
+                            break;
+                        case 'table_name':
+                                $rtableName = $stripper->offsetGet('table_name')->getFilterValue();
+                            break; 
+                        case 'membership_types_name':
+                                $rmembershipTypesName = $stripper->offsetGet('membership_types_name')->getFilterValue();                            
+                            break;
+                        case 'membership_types_name_eng':
+                                $rmembershipTypesNameEng = $stripper->offsetGet('membership_types_name_eng')->getFilterValue();                            
+                            break; 
+                        case 'period_name':
+                                $rperiodName = $stripper->offsetGet('period_name')->getFilterValue();                            
+                            break;  
+                        case 'period_name_eng':
+                                $rperiodNameEng = $stripper->offsetGet('period_name_eng')->getFilterValue();                            
+                            break;   
+                        case 'preferred_language':
+                                $rpreferredLanguage = $stripper->offsetGet('preferred_language')->getFilterValue();                            
+                            break;   
+                        case 'cons_name':
+                                $rconsName = $stripper->offsetGet('cons_name')->getFilterValue();                            
+                            break;   
+                        case 'op_user_name':
+                                $ropUserName = $stripper->offsetGet('op_user_name')->getFilterValue();                            
+                            break;  
+                        case 'op_cons_name':
+                                $ropConsName = $stripper->offsetGet('op_cons_name')->getFilterValue();                            
+                            break;  
+                         case 'cons_operation_name':
+                                $rconsOperationName = $stripper->offsetGet('cons_operation_name')->getFilterValue();                            
+                            break; 
+                         case 'cons_operation_name_eng':
+                                $rconsOperationNameEng = $stripper->offsetGet('cons_operation_name_eng')->getFilterValue();                            
+                            break; 
+                        default:
+                            break;
+                    }
+                   
+                   
+                }
+            }
+        }  
+    
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }  
     if ($stripper->offsetExists('page')) {
         $vPage = $stripper->offsetGet('page')->getFilterValue();
     }
@@ -101,15 +244,46 @@ $app->get("/pkGetConsultantJobs_actProcessConfirm/", function () use ($app ) {
     
     $resDataGrid = $BLL->getConsultantJobs(array(    
         'pk' => $pk,
+        'language_code' => $vLanguageCode, 
         'page' => $vPage,
         'rows' => $vRows,
         'sort' => $vSort,
-        'order' => $vOrder,        
-        'filterRules' => $filterRules,
+        'order' => $vOrder,    
+        
+        'fr_operation_name' =>$roperationName,
+        'fr_operation_name_eng' =>$roperationNameEng,
+        'fr_category' =>$rcategory,
+        'fr_category_eng' =>$rcategoryEng,
+        'fr_table_name' =>$rtableName,
+        'fr_membership_types_name' =>$rmembershipTypesName,        
+        'fr_membership_types_name_eng' =>$rmembershipTypesNameEng,
+        'fr_period_name' =>$rperiodName,
+        'fr_period_name_eng' =>$rperiodNameEng,
+        'fr_preferred_language' =>$rpreferredLanguage,
+        'fr_op_user_name' =>$ropUserName,
+        'fr_cons_name' =>$rconsName,
+        'fr_op_cons_name' =>$ropConsName,
+        'fr_cons_operation_name' =>$rconsOperationName,
+        'fr_cons_operation_name_eng' =>$rconsOperationNameEng,        
     ));
     $resTotalRowCount = $BLL->getConsultantJobsRtc(array(    
         'pk' => $pk,
-        'filterRules' => $filterRules,
+        'language_code' => $vLanguageCode,
+        'fr_operation_name' =>$roperationName,
+        'fr_operation_name_eng' =>$roperationNameEng,
+        'fr_category' =>$rcategory,
+        'fr_category_eng' =>$rcategoryEng,
+        'fr_table_name' =>$rtableName,
+        'fr_membership_types_name' =>$rmembershipTypesName,        
+        'fr_membership_types_name_eng' =>$rmembershipTypesNameEng,
+        'fr_period_name' =>$rperiodName,
+        'fr_period_name_eng' =>$rperiodNameEng,
+        'fr_preferred_language' =>$rpreferredLanguage,
+        'fr_op_user_name' =>$ropUserName,
+        'fr_cons_name' =>$rconsName,
+        'fr_op_cons_name' =>$ropConsName,
+        'fr_cons_operation_name' =>$rconsOperationName,
+        'fr_cons_operation_name_eng' =>$rconsOperationNameEng,    
     ));
     $counts = 0;
     $flows = array();

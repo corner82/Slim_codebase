@@ -197,12 +197,12 @@ class BlActivationReport extends \DAL\DalSlim {
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
- 
-     
+      
     /**
      * 
      * @author Okan CIRAN
      * @ Aktif firma sayısını döndürür  !!
+     * firma tabloları  olmadıgı için sablon olarak burada
      * @version v 1.0  05.02.2016
      * @param array | null $args
      * @return array
@@ -213,10 +213,16 @@ class BlActivationReport extends \DAL\DalSlim {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');  
             $sql = "     
                 SELECT 
+                    0 AS adet ,
+                    'Firma Sayısı' AS aciklama                
+               /* 
+               SELECT 
                     COUNT(id) AS adet ,
                     'Firma Sayısı' AS aciklama
                 FROM info_firm_profile 
-                WHERE deleted =0 AND active =0 AND language_parent_id =0               
+                WHERE deleted =0 AND active =0 AND language_parent_id =0 
+                */
+                
                     ";  
             $statement = $pdo->prepare($sql);
             $statement->execute();       
@@ -231,10 +237,12 @@ class BlActivationReport extends \DAL\DalSlim {
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
-     /**
+    
+    /**
      * 
      * @author Okan CIRAN
      * @ Aktif firma sayısını döndürür  !!
+      * firma tabloları olmadıgı için sablon olarak burada.
      * @version v 1.0  05.02.2016
      * @param array | null $args
      * @return array
@@ -249,11 +257,16 @@ class BlActivationReport extends \DAL\DalSlim {
                 
             $sql = "     
                 SELECT 
+                    0 AS adet ,
+                    'Firma Sayısı' AS aciklama                
+                /*
+                SELECT 
                     COUNT(id) AS adet ,
                     'Firma Sayısı' AS aciklama
                 FROM info_firm_profile 
                 WHERE deleted =0 AND active =0 AND language_parent_id =0 AND                
                      consultant_id = ".intval($opUserIdValue)."
+                */
                 
                     ";  
             $statement = $pdo->prepare($sql);
@@ -274,9 +287,8 @@ class BlActivationReport extends \DAL\DalSlim {
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
-
  
-      /**
+    /**
      * 
      * @author Okan CIRAN
      * @ Aktif firma sayısını döndürür  !!
@@ -296,15 +308,27 @@ class BlActivationReport extends \DAL\DalSlim {
                 
                     SELECT ids,aciklama,adet FROM  (
 				SELECT ids, aciklama, adet from (
+                                                SELECT      
+						    1 as ids, 
+						    cast('Toplam Firma Sayısı' as character varying(50))  AS aciklama,                      
+                                                    cast(COALESCE(count(0),0) as character varying(5)) AS adet
+                                        /*
 						SELECT      
 						    1 as ids, 
 						    cast('Toplam Firma Sayısı' as character varying(50))  AS aciklama,                      
 						     cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                          
 						FROM info_firm_profile a
 						WHERE deleted =0 AND active =0 AND language_parent_id =0 
+                                        */
 				) as dasda
                     UNION 
 				SELECT   ids,  aciklama, adet from (
+                                                SELECT 
+						    2 as ids, 
+						    cast('Onaylanmış Firma Sayısı' as character varying(50))  AS aciklama,   
+                                                    cast(COALESCE(count(0),0) as character varying(5)) AS adet
+						
+                                            /*
 						SELECT 
 						    2 as ids, 
 						    cast('Onaylanmış Firma Sayısı' as character varying(50))  AS aciklama,   
@@ -313,10 +337,16 @@ class BlActivationReport extends \DAL\DalSlim {
 						INNER JOIN sys_operation_types op ON op.parent_id = 2 AND a.operation_type_id = op.id AND op.active = 0 AND op.deleted =0
 						WHERE a.deleted =0 AND a.active =0 AND a.language_parent_id =0 AND
 						      a.operation_type_id = 5
+                                            */
+                                            
 				) as dasdb
                     UNION 
 				SELECT  ids,   aciklama,    adet from (
-						SELECT  3 as ids,
+                                                SELECT  3 as ids,
+                                                    cast('Danışmanın Firma Sayısı' as character varying(50))  AS aciklama,
+                                                    cast(COALESCE(count(0),0) as character varying(5)) AS adet						
+                                            /*
+                                                SELECT  3 as ids,
 						 cast('Danışmanın Firma Sayısı' as character varying(50))  AS aciklama,                      
 						        cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                     
 						FROM info_firm_profile a                                    
@@ -324,9 +354,14 @@ class BlActivationReport extends \DAL\DalSlim {
 						INNER JOIN sys_acl_roles acl ON acl.id = u.role_id  
 						WHERE a.active = 0 AND a.deleted = 0 AND a.language_parent_id =0 AND
 						    a.consultant_id = ".intval($opUserIdValue)." 
+                                            */
 				) as dasc
                     UNION 
 				SELECT  ids, aciklama, adet from (
+                                                SELECT   4 as ids,  
+                                                    cast('Danışman Onayı Bekleyen Firma' as character varying(50))  AS aciklama,                      
+						    cast(COALESCE(count(0),0) as character varying(5)) AS adet
+                                            /*
 						SELECT   4 as ids,  
 						cast('Danışman Onayı Bekleyen Firma' as character varying(50))  AS aciklama,                      
 						    cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                         
@@ -336,6 +371,7 @@ class BlActivationReport extends \DAL\DalSlim {
 						INNER JOIN sys_operation_types op ON op.parent_id = 1 AND a.operation_type_id = op.id AND op.active = 0 AND op.deleted =0
 						WHERE a.language_parent_id =0 AND
 						    a.consultant_id =".intval($opUserIdValue)." 
+                                            */
 				 ) as dasdd
 				 
 		   ) AS ttemp
@@ -361,7 +397,7 @@ class BlActivationReport extends \DAL\DalSlim {
         }
     }
 
-     /**
+    /**
      * 
      * @author Okan CIRAN
      * @ Danışmanın onay bekleyen firmalarının bilgilerini döndürür  !!
@@ -370,8 +406,7 @@ class BlActivationReport extends \DAL\DalSlim {
      * @param array | null $args
      * @return array
      * @throws \PDOException
-     */
-    
+     */    
     public function getConsWaitingForConfirm_eskisi($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');             
@@ -387,6 +422,11 @@ class BlActivationReport extends \DAL\DalSlim {
                     ELSE 0 
                     END AS sure
                 FROM (
+                SELECT 1,
+                        EXTRACT(EPOCH FROM age(cast('2017-02-06 09:47:33.87+02' as date))) AS sure_int,  
+			'Olmayan Firma' AS aciklama, 
+                        CAST(CURRENT_TIMESTAMP - '2017-02-06' AS VARCHAR(20)) AS sure
+                /*    
                     SELECT a.id,
                         EXTRACT(EPOCH FROM age(a.s_date)) AS sure_int,  
 			a.firm_name AS aciklama, 
@@ -396,6 +436,7 @@ class BlActivationReport extends \DAL\DalSlim {
                     INNER JOIN sys_operation_types op ON op.parent_id = 1 AND a.operation_type_id = op.id AND op.active = 0 AND op.deleted =0
                     WHERE a.language_parent_id =0 AND
                         a.consultant_id = ".intval($opUserIdValue)."                     
+                */
                     ) AS asdasd
                 ORDER BY sure DESC
                 LIMIT 6
@@ -419,9 +460,8 @@ class BlActivationReport extends \DAL\DalSlim {
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
-
  
-     /**
+    /**
      * 
      * @author Okan CIRAN
      * @ Danışmanın onay bekleyen firmalarının bilgilerini döndürür  !!
@@ -429,8 +469,7 @@ class BlActivationReport extends \DAL\DalSlim {
      * @param array | null $args
      * @return array
      * @throws \PDOException
-     */
-    
+     */    
     public function getConsWaitingForConfirm($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
@@ -566,4 +605,357 @@ class BlActivationReport extends \DAL\DalSlim {
         }
     }
 
+    /**
+     * 
+     * @author Okan CIRAN
+     * @ urge elemanının Aktif firma sayısını döndürür  !!
+     * codebase de  firma ve urge yapısı olmadıgından sadece sablon olarak bulunuyor.
+     * @version v 1.0  25.01.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function getUrgeUpDashBoardCount($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');             
+            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));            
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId['resultSet'][0]['user_id'];
+                
+            $sql = "  
+                SELECT ids,aciklama,adet FROM  (
+				SELECT ids, aciklama, adet from (
+                                                SELECT      
+						    2 as ids, 
+						    cast('Toplam Firma Sayısı' as character varying(50))  AS aciklama,                      
+                                                    cast(COALESCE(count(0),0) as character varying(5)) AS adet
+                                        /*
+						SELECT      
+						    2 as ids, 
+						    cast('Toplam Firma Sayısı' as character varying(50))  AS aciklama,                      
+						     cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                          
+						FROM info_firm_profile a
+						WHERE deleted =0 AND active =0 AND language_parent_id =0 
+                                        */
+				) as dasda
+                    UNION 
+				SELECT   ids,  aciklama, adet from (
+                                                SELECT 
+						    4 as ids, 
+						    cast('Küme Firma Sayısı' as character varying(50))  AS aciklama,   
+                                                    cast(COALESCE(count(0),0) as character varying(5)) AS adet						
+                                            /*
+						SELECT 
+						    4 as ids, 
+						    cast('Küme Firma Sayısı' as character varying(50))  AS aciklama,   
+						      cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                    
+						FROM info_firm_profile a
+						INNER JOIN sys_osb_person sop ON sop.user_id = ".  intval($opUserIdValue)."
+						INNER JOIN info_firm_clusters  ifc ON ifc.firm_id = a.act_parent_id AND ifc.active = 0 AND ifc.deleted =0 AND ifc.osb_cluster_id = sop.osb_cluster_id
+						WHERE a.deleted =0 AND a.active =0 AND a.language_parent_id = 0  
+                                            */
+				) as dasdb
+                    UNION 
+				SELECT  ids,   aciklama,    adet from (
+						SELECT  1 as ids,
+						 cast('Toplam OSB Sayısı' as character varying(50))  AS aciklama,                      
+						        cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                     
+						FROM sys_osb a    
+						WHERE a.active = 0 AND a.deleted = 0 AND a.language_parent_id =0  
+				) as dasc
+                    UNION 
+				SELECT  ids, aciklama, adet from (
+						SELECT   3 as ids,  
+						cast('Toplam Küme Sayısı' as character varying(50))  AS aciklama,                      
+						    cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                         
+						FROM sys_osb_clusters a						
+						WHERE a.deleted =0 AND a.active =0 AND a.osb_id > 0  AND a.language_parent_id =0  
+				 ) as dasdd
+				 
+		   ) AS ttemp
+                ORDER BY ids 
+                    ";   
+            $statement = $pdo->prepare($sql);
+            //  echo debugPDO($sql, $params);
+            $statement->execute();       
+            $result = $statement->fetchAll(\PDO::FETCH_CLASS);        
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            //return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+            return json_encode($result);
+            } else {
+                $errorInfo = '23502';   // 23502  not_null_violation
+                $errorInfoColumn = 'pk';        
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);            }
+        } catch (\PDOException $e /* Exception $e */) {  
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+
+    /**
+     * 
+     * @author Okan CIRAN
+     * @ urge dashboard en üst istatistiksel veriler !!
+     * codebase de  firma ve urge yapısı olmadıgından sadece sablon olarak bulunuyor.
+     * @version v 1.0  26.01.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function getUrgeUpFirstDashBoardCount($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');             
+            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));            
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId['resultSet'][0]['user_id'];
+                
+            $sql = "  
+               SELECT ids,aciklama,adet FROM  (
+				SELECT ids, aciklama, adet from (
+                                                SELECT      
+                                                    2 AS ids, 
+                                                    CAST('Bu ay içindeki aktivasyon Sayısı' as character varying(50))  AS aciklama,
+                                                    CAST(COALESCE(count(0),0) AS character varying(5)) AS adet                                                   
+                                            /*
+						SELECT      
+                                                    2 AS ids, 
+                                                    CAST('Bu ay içindeki aktivasyon Sayısı' as character varying(50))  AS aciklama,
+                                                    CAST(COALESCE(count(a.id),0) AS character varying(5)) AS adet   
+                                                FROM info_cluster_organizations  a   
+                                                INNER JOIN sys_osb_person sop ON sop.osb_cluster_id = a.osb_cluster_id  AND sop.user_id = ".  intval($opUserIdValue)."           	     
+                                                INNER JOIN sys_countrys co ON co.id = a.country_id AND co.deleted = 0 AND co.active = 0 
+                                                LEFT JOIN sys_city ct ON ct.id = a.city_id AND ct.deleted = 0 AND ct.active = 0 AND ct.language_id = a.language_id 
+                                                LEFT JOIN sys_borough bo ON bo.id = a.borough_id AND bo.deleted = 0 AND bo.active = 0 AND bo.language_id = a.language_id  
+                                                WHERE 
+                                                    CURRENT_date <start_date AND 
+                                                    EXTRACT(MONTH FROM CURRENT_date) = EXTRACT(MONTH FROM start_date) AND
+                                                    a.deleted =0 AND 
+                                                    a.active =0 AND 
+                                                    a.language_parent_id =0
+                                            */        
+				) AS dasda
+                    UNION 
+				SELECT   ids,  aciklama, adet from (
+                                                SELECT      
+						     4 AS ids, 
+						     CAST('İleri Tarihli Aktivasyon Sayısı' AS character varying(50)) AS aciklama,
+						     CAST(COALESCE(count(0),0) AS character varying(5)) AS adet                                                   
+                                            /*
+						SELECT      
+						     4 AS ids, 
+						     CAST('İleri Tarihli Aktivasyon Sayısı' AS character varying(50)) AS aciklama,
+						     CAST(COALESCE(count(a.id),0) AS character varying(5)) AS adet   
+                                                FROM info_cluster_organizations a   
+                                                INNER JOIN sys_osb_person sop ON sop.osb_cluster_id = a.osb_cluster_id  AND sop.user_id = ".  intval($opUserIdValue)."
+                                                INNER JOIN sys_countrys co ON co.id = a.country_id AND co.deleted = 0 AND co.active = 0 
+                                                LEFT JOIN sys_city ct ON ct.id = a.city_id AND ct.deleted = 0 AND ct.active = 0 AND ct.language_id = a.language_id 
+                                                LEFT JOIN sys_borough bo ON bo.id = a.borough_id AND bo.deleted = 0 AND bo.active = 0 AND bo.language_id = a.language_id  
+                                                WHERE 
+                                                    CURRENT_date <start_date AND
+                                                    a.deleted =0 AND
+                                                    a.active =0 AND
+                                                    a.language_parent_id =0
+                                            */                                            
+				) AS dasdb
+                    UNION 
+				SELECT  ids,   aciklama,    adet from (
+                                                SELECT 
+						    1 as ids, 
+						    CAST('Bütün Kümelerdeki Çalışan Sayısı' AS character varying(50)) AS aciklama,   
+                                                    CAST( 
+							COALESCE(
+							(sum(0)   
+							     ),0) as character varying(5)) AS adet
+                                            /*
+						SELECT 
+						    1 as ids, 
+						    CAST('Bütün Kümelerdeki Çalışan Sayısı' AS character varying(50)) AS aciklama,   
+                                                    CAST( 
+							COALESCE(
+							(sum(ifpi.number_of_employees)   
+							     ),0) as character varying(5))   AS adet                    
+						FROM info_firm_profile a						
+						INNER JOIN info_firm_personnel_info ifpi ON ifpi.firm_id = a.act_parent_id AND ifpi.active =0 AND ifpi.deleted =0 
+						WHERE 
+                                                    a.deleted =0 AND 
+                                                    a.active =0 AND 
+                                                    a.language_parent_id = 0 AND 
+                                                    a.cons_allow_id = 2 AND
+                                                    a.act_parent_id IN
+                                                        (SELECT DISTINCT zx.firm_id FROM info_firm_clusters zx WHERE zx.firm_id = a.act_parent_id AND zx.active = 0 AND zx.deleted =0 )
+                                            */
+				) AS dasc
+                    UNION 
+				SELECT  ids, aciklama, adet from (
+                                                SELECT 
+						    3 AS ids, 
+						    cast('Küme Firmalarında Çalışan Sayısı' AS character varying(50)) AS aciklama,   
+						      cast( 
+							COALESCE(
+							(sum(0)   
+							     ),0) as character varying(5)) AS adet 						
+                                            /*
+						SELECT 
+						    3 AS ids, 
+						    cast('Küme Firmalarında Çalışan Sayısı' AS character varying(50)) AS aciklama,   
+						      cast( 
+							COALESCE(
+							(sum(ifpi.number_of_employees)   
+							     ),0) as character varying(5)) AS adet 
+						FROM info_firm_profile a
+						INNER JOIN sys_osb_person sop ON sop.user_id = ".  intval($opUserIdValue)."
+						INNER JOIN info_firm_clusters  ifc ON ifc.firm_id = a.act_parent_id AND ifc.active = 0 AND ifc.deleted =0 AND ifc.osb_cluster_id = sop.osb_cluster_id
+						INNER JOIN info_firm_personnel_info ifpi ON ifpi.firm_id = ifc.firm_id AND ifpi.active =0 AND ifpi.deleted =0 
+						WHERE 
+                                                    a.deleted =0 AND 
+                                                    a.active =0 AND 
+                                                    a.language_parent_id = 0 
+                                            */ 
+				 ) AS dasdd
+		   ) AS ttemp
+                ORDER BY ids 
+
+                    ";   
+            $statement = $pdo->prepare($sql);
+            //  echo debugPDO($sql, $params);
+            $statement->execute();       
+            $result = $statement->fetchAll(\PDO::FETCH_CLASS);        
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            //return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+            return json_encode($result);
+            } else {
+                $errorInfo = '23502';   // 23502  not_null_violation
+                $errorInfoColumn = 'pk';        
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);            }
+        } catch (\PDOException $e /* Exception $e */) {  
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+    
+    /**  
+     * @author Okan CIRAN
+     * @ urge elamanlarının girdikleri organizasyon bilgilerini döndürür  !!     
+     *  !! o andaki tarihten sonraki !!
+     * codebase de  firma ve urge yapısı olmadıgından sadece sablon olarak bulunuyor.
+     * @version v 1.0  17.07.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function fillUrgeOrganizations($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
+            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId['resultSet'][0]['user_id']; 
+                 
+                
+                $sql = " 
+                SELECT
+                    1 as id,
+                    '' as organization_name,
+                    '' as address1,
+                    '' as address2, 
+                    '' as country, 
+                    '' AS city_name,
+                    '' as borough,
+                    substring(CAST(CURRENT_date - '2017-02-06' AS VARCHAR(20))FROM '[0-9]+') AS sure,
+                    '' as description,
+                    '' as description_eng                 
+                /*
+                SELECT
+                    a.id,
+                    a.organization_name,
+                    a.address1,
+                    a.address2, 
+                    co.name as country, 
+                    COALESCE(NULLIF(ct.name, ''), a.city_name) AS city_name,
+                    bo.name as borough,
+                    substring(CAST(CURRENT_date - start_date AS VARCHAR(20))FROM '[0-9]+') AS sure,
+                    a.description,
+                    a.description_eng
+                 FROM info_cluster_organizations  a   
+                 INNER JOIN sys_osb_person sop ON sop.osb_cluster_id = a.osb_cluster_id  AND sop.user_id =  ".  intval($opUserIdValue)."           	     
+                 INNER JOIN sys_countrys co on co.id = a.country_id AND co.deleted = 0 AND co.active = 0 AND co.language_parent_id =0                
+                 LEFT JOIN sys_city ct on ct.id = a.city_id AND ct.deleted = 0 AND ct.active = 0 AND ct.language_id = a.language_id 
+                 LEFT JOIN sys_borough bo on bo.id = a.borough_id AND bo.deleted = 0 AND bo.active = 0 AND bo.language_id = a.language_id                   
+                 WHERE 
+                    CURRENT_date < start_date AND 
+                        a.deleted =0 AND
+                        a.active =0 AND 
+                        a.language_parent_id =0
+                */
+                                 ";
+                $statement = $pdo->prepare($sql);
+                //echo debugPDO($sql, $params);
+                $statement->execute();
+                $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+                $errorInfo = $statement->errorInfo();
+                if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                    throw new \PDOException($errorInfo[0]);
+                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+            } else {
+                $errorInfo = '23502';   // 23502  not_null_violation
+                $errorInfoColumn = 'pk';
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+            }
+        } catch (\PDOException $e /* Exception $e */) {
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }    
+      
+    /**  
+     * @author Okan CIRAN
+     * @ urge elamanlarının girdikleri organizasyon bilgilerinin sayısını döndürür  !!     
+     *  !! o andaki tarihten sonraki !!
+     * codebase de  firma ve urge yapısı olmadıgından sadece sablon olarak bulunuyor.
+     * @version v 1.0  17.07.2017
+     * @param array | null $args
+     * @return array
+     * @throws \PDOException
+     */
+    public function fillUrgeOrganizationsRtc($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
+            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId['resultSet'][0]['user_id']; 
+                $sql = " 
+                SELECt  
+                   count(20) as count                
+                /*
+                SELECt  
+                   count( a.id) as count
+                 FROM info_cluster_organizations a
+                 INNER JOIN sys_osb_person sop ON sop.osb_cluster_id = a.osb_cluster_id  AND sop.user_id =  ".  intval($opUserIdValue)."
+                 INNER JOIN sys_countrys co on co.id = a.country_id AND co.deleted = 0 AND co.active = 0
+                 WHERE 
+                    CURRENT_date < start_date AND 
+                    a.deleted =0 AND
+                    a.active =0 AND 
+                    a.language_parent_id =0
+                */
+                                 ";
+                $statement = $pdo->prepare($sql);
+                //echo debugPDO($sql, $params);
+                $statement->execute();
+                $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+                $errorInfo = $statement->errorInfo();
+                if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                    throw new \PDOException($errorInfo[0]);
+                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+            } else {
+                $errorInfo = '23502';   // 23502  not_null_violation
+                $errorInfoColumn = 'pk';
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+            }
+        } catch (\PDOException $e /* Exception $e */) {
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+ 
+    
 }

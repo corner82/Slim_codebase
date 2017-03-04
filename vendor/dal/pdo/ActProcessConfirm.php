@@ -457,130 +457,82 @@ class ActProcessConfirm extends \DAL\DalSlim {
             $order = "ASC";
         }
 
-        $sorguStr = null;
-        if ((isset($args['filterRules']) && $args['filterRules'] != "")) {
-            $filterRules = trim($args['filterRules']);
-            $jsonFilter = json_decode($filterRules, true);
-
-            $sorguExpression = null;
-            foreach ($jsonFilter as $std) {
-                if ($std['value'] != null) {
-                    switch (trim($std['field'])) {
-                        case 'operation_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\' ';
-                            $sorguStr.=" AND operation_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'operation_name_eng':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\' ';
-                            $sorguStr.=" AND operation_name_eng" . $sorguExpression . ' ';
-
-                            break;
-                        case 'category':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND category" . $sorguExpression . ' ';
-
-                            break;
-                        case 'category_eng':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND category_eng" . $sorguExpression . ' ';
-
-                            break;
-                        case 'table_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND table_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'membership_types_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND membership_types_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'membership_types_name_eng':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND membership_types_name_eng" . $sorguExpression . ' ';
-
-                            break;
-                        case 'period_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND period_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'period_name_eng':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND period_name_eng" . $sorguExpression . ' ';
-
-                            break;
-                        case 'preferred_language':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND preferred_language" . $sorguExpression . ' ';
-
-                            break;
-                        case 'cons_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND cons_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'cons_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND cons_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'op_user_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND op_user_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'op_cons_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND op_cons_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'cons_operation_name':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND cons_operation_name" . $sorguExpression . ' ';
-
-                            break;
-                        case 'cons_operation_name_eng':
-                            $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                            $sorguStr.=" AND cons_operation_name_eng" . $sorguExpression . ' ';
-
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        } else {
-            $sorguStr = null;
-            $filterRules = "";            
-            if (isset($args['operation_type_id']) && $args['operation_type_id'] != "") {
-                $sorguStr .= " AND operation_type_id = " . intval($args['operation_type_id']);
-            }
-            if (isset($args['category_id']) && $args['category_id'] != "") {
-                $sorguStr .= " AND category_id = " . intval($args['category_id']);
-            }
-            if (isset($args['membership_types_id']) && $args['membership_types_id'] != "") {
-                $sorguStr .= " AND membership_types_id = " . intval($args['membership_types_id']);
-            }
-            if (isset($args['sys_membership_periods_id']) && $args['sys_membership_periods_id'] != "") {
-                $sorguStr .= " AND sys_membership_periods_id = " . intval($args['sys_membership_periods_id']);
-            }
-            if (isset($args['preferred_language_id']) && $args['preferred_language_id'] != "") {
-                $sorguStr .= " AND preferred_language_id = " . intval($args['preferred_language_id']);
-            }
-            if (isset($args['cons_operation_type_id']) && $args['cons_operation_type_id'] != "") {
-                $sorguStr .= " AND cons_operation_type_id = " . intval($args['cons_operation_type_id']);
-            }            
-                        
+        $sorguStr = null;  
+        
+        if (isset($args['operation_type_id']) && $args['operation_type_id'] != "") {
+                $sorguStr .= " AND a.operation_type_id = " . intval($args['operation_type_id']);
         }
-        $sorguStr = rtrim($sorguStr, "AND ");
+        if (isset($args['category_id']) && $args['category_id'] != "") {
+            $sorguStr .= " AND sot.category_id = " . intval($args['category_id']);
+        }
+        if (isset($args['membership_types_id']) && $args['membership_types_id'] != "") {
+            $sorguStr .= " AND smt.id = " . intval($args['membership_types_id']);
+        }
+        if (isset($args['sys_membership_periods_id']) && $args['sys_membership_periods_id'] != "") {
+            $sorguStr .= " AND a.sys_membership_periods_id = " . intval($args['sys_membership_periods_id']);
+        }
+        if (isset($args['preferred_language_id']) && $args['preferred_language_id'] != "") {
+            $sorguStr .= " AND a.preferred_language_id = " . intval($args['preferred_language_id']);
+        }
+        if (isset($args['cons_operation_type_id']) && $args['cons_operation_type_id'] != "") {
+            $sorguStr .= " AND a.cons_operation_type_id = " . intval($args['cons_operation_type_id']);
+        }   
+        
+        ///////////////////////////////////
+        if (isset($args['fr_operation_name']) && $args['fr_operation_name'] != "") {
+            $sorguStr .= " AND LOWER(COALESCE(NULLIF(sotx.operation_name, ''), sot.operation_name_eng)) LIKE LOWER('%" .  $args['fr_operation_name'] ."%')";
+        }
+        if (isset($args['fr_operation_name_eng']) && $args['fr_operation_name_eng'] != "") {
+            $sorguStr .= " AND LOWER(sot.operation_name_eng) LIKE LOWER('%" .  $args['fr_operation_name_eng'] ."%')";
+        }
+        if (isset($args['fr_category']) && $args['fr_category'] != "") {
+            $sorguStr .= " AND LOWER(COALESCE(NULLIF(soccx.category, ''), socc.category_eng)) LIKE LOWER('%" .  $args['fr_category'] ."%')";
+        }
+        if (isset($args['fr_category_eng']) && $args['fr_category_eng'] != "") {
+            $sorguStr .= " AND LOWER(socc.category_eng) LIKE LOWER('%" .  $args['fr_category_eng'] ."%')";
+        }
+        if (isset($args['fr_table_name']) && $args['fr_table_name'] != "") {
+            $sorguStr .= " AND LOWER(sot.table_name) LIKE LOWER('%" .  $args['fr_table_name'] ."%')";
+        }
+        if (isset($args['fr_membership_types_name']) && $args['fr_membership_types_name'] != "") {
+            $sorguStr .= " AND LOWER(COALESCE(NULLIF(smtx.mem_type, ''), smt.mem_type_eng)) LIKE LOWER('%" .  $args['fr_membership_types_name'] ."%')";
+        }           
+        if (isset($args['fr_membership_types_name_eng']) && $args['fr_membership_types_name_eng'] != "") {
+            $sorguStr .= " AND LOWER(smt.mem_type_eng) LIKE LOWER('%" .  $args['fr_membership_types_name_eng'] ."%')";
+        }  
+        if (isset($args['fr_period_name']) && $args['fr_period_name'] != "") {
+            $sorguStr .= " AND LOWER(COALESCE(NULLIF(spx.period_name, ''), sp.period_name_eng)) LIKE LOWER('%" .  $args['fr_period_name'] ."%')";
+        }  
+        if (isset($args['fr_period_name_eng']) && $args['fr_period_name_eng'] != "") {
+            $sorguStr .= " AND LOWER(sp.period_name_eng) LIKE LOWER('%" .  $args['fr_period_name_eng'] ."%')";
+        }  
+        if (isset($args['fr_preferred_language']) && $args['fr_preferred_language'] != "") {
+            $sorguStr .= " AND LOWER(COALESCE(NULLIF(lpx.language, ''), lp.language_eng)) LIKE LOWER('%" .  $args['fr_preferred_language'] ."%')";
+        }  
+        if (isset($args['fr_op_user_name']) && $args['fr_op_user_name'] != "") {
+            $sorguStr .= " AND LOWER(opuc.username) LIKE LOWER('%" .  $args['fr_op_user_name'] ."%')";
+        }  
+        if (isset($args['fr_cons_name']) && $args['fr_cons_name'] != "") {
+            $sorguStr .= " AND LOWER(uc.username) LIKE LOWER('%" .  $args['fr_cons_name'] ."%')";
+        }  
+        if (isset($args['fr_op_cons_name']) && $args['fr_op_cons_name'] != "") {
+            $sorguStr .= " AND LOWER(u.username) LIKE LOWER('%" .  $args['fr_op_cons_name'] ."%')";
+        }  
+        if (isset($args['fr_cons_operation_name']) && $args['fr_cons_operation_name'] != "") {
+            $sorguStr .= " AND LOWER(COALESCE(NULLIF(sotconsx.operation_name, ''), sotcons.operation_name_eng)) LIKE LOWER('%" .  $args['fr_cons_operation_name'] ."%')";
+        }  
+        if (isset($args['fr_cons_operation_name_eng']) && $args['fr_cons_operation_name_eng'] != "") {
+            $sorguStr .= " AND LOWER(sotcons.operation_name_eng) LIKE LOWER('%" .  $args['fr_cons_operation_name_eng'] ."%')";
+        }  
+        //////////////////////////////////
+        
+        
 
         /*
          * pk sahibi cons un işlerinin döndürücez
          */
         $opConsIdValue =0;        
-        $opUserIdParams = array('pk' =>  $params['pk'],);
+        $opUserIdParams = array('pk' =>  $args['pk'],);
         $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
         $opConsId = $opUserIdArray->getUserId($opUserIdParams); 
         if (\Utill\Dal\Helper::haveRecord($opConsId)) {
@@ -599,7 +551,7 @@ class ActProcessConfirm extends \DAL\DalSlim {
          * cons_id = -1 ise tüm cons ların işlemlerinin döndürücez.. 
          */
         if (isset($args['cons_id']) && $args['cons_id'] != -1) {
-           $addSql = ""; 
+           $addSql = " WHERE 1=1 "; 
         }
         
         $languageCode = 'tr';
@@ -701,9 +653,9 @@ class ActProcessConfirm extends \DAL\DalSlim {
                     LEFT JOIN sys_operation_types sotconsx ON (sotconsx.id = sotcons.id OR sotconsx.language_parent_id = sotcons.id) AND sotconsx.deleted =0 AND sotconsx.active =0 AND lx.id = sotconsx.language_id
                     LEFT JOIN sys_periods sp ON sp.id = smp.period_id AND sp.language_parent_id =0 AND l.id = sp.language_id
                     LEFT JOIN sys_periods spx ON (spx.id = sp.id OR spx.language_parent_id = sp.id) AND spx.deleted =0 AND spx.active =0 AND lx.id = spx.language_id
-                    ".$addSql." 
+                    " . $addSql . " 
+                    " . $sorguStr . " 
                 ) AS xtable
-                " . $sorguStr . " 
                 ORDER BY    " . $sort . " "
                     . "" . $order . " "
                     . "LIMIT " . $pdo->quote($limit) . " "

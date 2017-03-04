@@ -294,13 +294,78 @@ $app->get("/pkFillRestServicesList_sysAclRestservices/", function () use ($app )
         $stripper->offsetSet('order', $stripChainerFactory->get(stripChainers::FILTER_ONLY_ORDER, 
                 $app, $_GET['order']));
     }
-    $filterRules = null;
+    ///////////////////////////////////////////////////////////// 
+    $rname = NULL;
+    $rdescription = NULL;
+    $rservicesGroupsName = NULL;
+    
+     if (isset($_GET['filterRules'])) {
+            $filterRules = trim($_GET['filterRules']);
+            $jsonFilter = json_decode($filterRules, true);             
+            foreach ($jsonFilter as $std) {
+                if ($std['value'] != null) {
+                    switch (trim($std['field'])) {
+                        case 'name':                            
+                            $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'description':
+                            $stripper->offsetSet('description', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));
+                            break;
+                        case 'services_groups_name':
+                            $stripper->offsetSet('services_groups_name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app,$std['value']));                            
+                            break;                        
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    
+                        
+    ////////////////////////////////////////////////////////////
+  
+    $stripper->strip();
+    
+    
     if (isset($_GET['filterRules'])) {
-        $stripper->offsetSet('filterRules', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_JASON_LVL1, 
-                $app, $_GET['filterRules']));
-    }
-
-    $stripper->strip(); 
+            $filterRules = trim($_GET['filterRules']);
+            $jsonFilter = json_decode($filterRules, true);             
+            $addfilterRules = NULL;
+            $filterRules = NULL;
+            foreach ($jsonFilter as $std) {
+                if ($std['value'] != NULL) {                    
+                    switch (trim($std['field'])) {
+                        case 'name':                            
+                                $rname = $stripper->offsetGet('name')->getFilterValue();
+                                $addfilterRules = '{"field":"name","op":"contains","value":"'.$rname.'"}';
+                                $filterRules .= $addfilterRules;
+                              //  print_r($filterRules);
+                            break;
+                        case 'description':
+                                $rdescription = $stripper->offsetGet('description')->getFilterValue();
+                                if ($filterRules != NULL) {$filterRules .=",";}
+                                $addfilterRules = '{"field":"description","op":"contains","value":"'.$rdescription.'"}';
+                                $filterRules .= $addfilterRules;
+                               // print_r($filterRules);
+                            break;
+                        case 'services_groups_name':
+                                $rservicesGroupsName = $stripper->offsetGet('services_groups_name')->getFilterValue();
+                            if ($addfilterRules != NULL) {$filterRules .=",";}
+                                $addfilterRules = '{"field":"services_groups_name","op":"contains","value":"'.$rservicesGroupsName.'"}';
+                                $filterRules .= $addfilterRules;
+                               // print_r($filterRules);
+                            break;                        
+                        default:
+                            break;
+                    }
+                   
+                   
+                }
+            }
+        } 
+      
+    if ($addfilterRules != NULL) { $filterRules = "[".$filterRules."]";}
+    //////////////////////////////////////////////////////////////////////////////
     
     if ($stripper->offsetExists('page')) {
         $vPage = $stripper->offsetGet('page')->getFilterValue();
@@ -314,9 +379,7 @@ $app->get("/pkFillRestServicesList_sysAclRestservices/", function () use ($app )
     if ($stripper->offsetExists('order')) {
         $vOrder = $stripper->offsetGet('order')->getFilterValue();
     }
-    if ($stripper->offsetExists('filterRules')) {
-        $filterRules = $stripper->offsetGet('filterRules')->getFilterValue();
-    }
+                        
     
     $resDataGrid = $BLL->FillRestservicesList(array(        
         'page' => $vPage,

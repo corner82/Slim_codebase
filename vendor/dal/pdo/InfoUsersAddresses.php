@@ -1028,7 +1028,6 @@ class InfoUsersAddresses extends \DAL\DalSlim {
      * @throws \PDOException
      */
     public function fillTextLanguageTemplate($args = array()) {
-
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $sql = "
@@ -1882,12 +1881,7 @@ class InfoUsersAddresses extends \DAL\DalSlim {
         }
     }
     
-    
-    
-    
-    
-    
-    
+     
     
 
 }

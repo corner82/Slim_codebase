@@ -255,9 +255,7 @@ class SysSpecificDefinitions extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * Datagrid fill function used for testing
-     * user interface datagrid fill operation   
+    /**  
      * @author Okan CIRAN
      * @ Gridi doldurmak için sys_specific_definitions tablosundan kayıtları döndürür !!
      * @version v 1.0  25.01.2016
@@ -361,8 +359,7 @@ class SysSpecificDefinitions extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * user interface datagrid fill operation get row count for widget
+    /** 
      * @author Okan CIRAN
      * @ Gridi doldurmak için sys_specific_definitions tablosundan çekilen kayıtlarının kaç tane olduğunu döndürür   !!
      * @version v 1.0  25.01.2016
@@ -409,10 +406,9 @@ class SysSpecificDefinitions extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * Combobox fill function used for testing
-     * user interface combobox fill operation   
+    /** 
      * @author Okan CIRAN
+     * su  an kullanılmıyor
      * @ combobox doldurmak için sys_specific_definitions tablosundan parent ı 0 olan kayıtları (Ana grup) döndürür !!
      * @version v 1.0  25.01.2016
      * @param array | null $args
@@ -444,11 +440,10 @@ class SysSpecificDefinitions extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * Combobox fill function used for testing
-     * user interface combobox fill operation   
+    /** 
      * @author Okan CIRAN
      * @ combobox doldurmak için sys_specific_definitions tablosundan tüm kayıtları döndürür !!
+     * bu servis  kullanılmıyor
      * @version v 1.0  25.01.2016
      * @param array | null $params
      * @return array
@@ -469,7 +464,7 @@ class SysSpecificDefinitions extends \DAL\DalSlim {
                     $languageIdValue = $languageId ['resultSet'][0]['id'];                    
                 }
             }  
-            $statement = $pdo->prepare("             
+            $statement = $pdo->prepare("                    
                 SELECT                    
                     a.first_group AS id, 	
                     COALESCE(NULLIF(sd.description, ''), a.description_eng) AS name,  

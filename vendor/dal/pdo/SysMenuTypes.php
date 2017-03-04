@@ -529,7 +529,7 @@ class SysMenuTypes extends \DAL\DalSlim {
     /**
      * @author Okan CIRAN
      * @ sys_menu_types bilgilerini döndürür !!
-     * filterRules aktif 
+     * filterRules aktif - endpointte tasındı
      * @version v 1.0  21.07.2016
      * @param array | null $args
      * @return array
@@ -565,90 +565,38 @@ class SysMenuTypes extends \DAL\DalSlim {
                     $order = trim($params['order']);
             } else {
                 $order = "ASC";
-            }
-
-            $sorguStr = null;
-            if ((isset($params['filterRules']) && $params['filterRules'] != "")) {
-                $filterRules = trim($params['filterRules']);
-                $jsonFilter = json_decode($filterRules, true);
-
-                $sorguExpression = null;
-                foreach ($jsonFilter as $std) {
-                    if ($std['value'] != null) {
-                        switch (trim($std['field'])) {
-                            case 'name':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\' ';
-                                $sorguStr.=" AND name" . $sorguExpression . ' ';
-
-                                break;
-                            case 'name_eng':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\' ';
-                                $sorguStr.=" AND name_eng" . $sorguExpression . ' ';
-
-                                break;
-                            case 'description':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND description" . $sorguExpression . ' ';
-
-                                break;     
-                            case 'description_eng':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND description_eng" . $sorguExpression . ' ';
-                            
-                                break;                             
-                            case 'state_active':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND state_active" . $sorguExpression . ' ';
-                            
-                                break; 
-                            case 'op_user_name':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND op_user_name" . $sorguExpression . ' ';
-                            
-                                break;
-                            case 'language_name':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND language_name" . $sorguExpression . ' ';
-                            
-                                break; 
-                            default:
-                                break;
-                        }
-                    }
-                }
-            } else {
-                $sorguStr = null;
-                $filterRules = "";
-                if (isset($params['name']) && $params['name'] != "") {
-                    $sorguStr .= " AND name Like '%" . $params['name'] . "%'";
-                }
-                if (isset($params['name_eng']) && $params['name_eng'] != "") {
-                    $sorguStr .= " AND name_eng Like '%" . $params['name_eng'] . "%'";
-                }
-                if (isset($params['description']) && $params['description'] != "") {
-                    $sorguStr .= " AND description Like '%" . $params['description'] . "%'";
-                }
-                if (isset($params['description_eng']) && $params['description_eng'] != "") {
-                    $sorguStr .= " AND description_eng Like '%" . $params['description_eng'] . "%'";
-                }           
-                if (isset($params['active']) && $params['active'] != "") {
-                    $sorguStr .= " AND active = " . intval($params['active']) ;
-                }
-                if (isset($params['op_user_name']) && $params['op_user_name'] != "") {
-                    $sorguStr .= " AND op_user_name Like '%" . $params['op_user_name'] . "%'";
-                }            
-                
-            }
-            $sorguStr = rtrim($sorguStr, "AND ");
+            }              
             
-            $languageId = NULL;
+            $languageCode = 'tr';
             $languageIdValue = 647;
-            if ((isset($params['language_code']) && $params['language_code'] != "")) {
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
+            if (isset($params['language_code']) && $params['language_code'] != "") {
+                $languageCode = $params['language_code'];
+            }       
+            $languageCodeParams = array('language_code' => $languageCode,);
+            $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+            $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+            if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                 $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+            }  
+            
+            if (isset($params['fr_name']) && $params['fr_name'] != "") {
+                $sorguStr .= " AND COALESCE(NULLIF(ax.name, ''), a.name_eng) Like '%" . $params['fr_name'] . "%'";
                 }
-            }
+            if (isset($params['fr_name_eng']) && $params['fr_name_eng'] != "") {
+                $sorguStr .= " AND a.name_eng Like '%" . $params['fr_name_eng'] . "%'";
+                }
+            if (isset($params['fr_description']) && $params['fr_description'] != "") {
+                $sorguStr .= " AND COALESCE(NULLIF(ax.description, ''), a.description_eng) Like '%" . $params['fr_description'] . "%'";
+                }
+            if (isset($params['fr_description_eng']) && $params['fr_description_eng'] != "") {
+                $sorguStr .= " AND a.description_eng Like '%" . $params['fr_description_eng'] . "%'";
+                }           
+            if (isset($params['active']) && $params['active'] != "") {
+                $sorguStr .= " AND a.active = " . intval($params['active']) ;
+                }
+            if (isset($params['fr_op_user_name']) && $params['fr_op_user_name'] != "") {
+                $sorguStr .= " AND u.username Like '%" . $params['fr_op_user_name'] . "%'";
+                }       
 
             
             $sql = "  
@@ -690,9 +638,11 @@ class SysMenuTypes extends \DAL\DalSlim {
                 LEFT JOIN sys_specific_definitions sd15x ON (sd15x.id = sd15.id OR sd15x.language_parent_id = sd15.id) AND sd15x.language_id =lx.id  AND sd15x.deleted =0 AND sd15x.active =0 
                 LEFT JOIN sys_specific_definitions sd16x ON (sd16x.id = sd16.id OR sd16x.language_parent_id = sd16.id)AND sd16x.language_id = lx.id  AND sd16x.deleted = 0 AND sd16x.active = 0
                 LEFT JOIN sys_menu_types ax ON (ax.id = a.id OR ax.language_parent_id = a.id) AND ax.deleted =0 AND ax.active =0 AND lx.id = ax.language_id                                
-                WHERE a.deleted =0 AND a.language_parent_id =0
-                    ) AS xtable WHERE deleted =0 
-                ".$sorguStr."
+                WHERE 
+                    a.deleted =0 AND 
+                    a.language_parent_id =0
+                    ".$sorguStr."
+                    ) AS xtable                
             ORDER BY    " . $sort . " "
                     . "" . $order . " "
                     . "LIMIT " . $pdo->quote($limit) . " "
@@ -719,7 +669,7 @@ class SysMenuTypes extends \DAL\DalSlim {
     /**
      * @author Okan CIRAN
      * @ sys_menu_types bilgilerinin sayısını döndürür !!
-     * filterRules aktif 
+     * filterRules aktif - endpointte tasındı
      * @version v 1.0  21.07.2016
      * @param array | null $args
      * @return array
@@ -728,88 +678,37 @@ class SysMenuTypes extends \DAL\DalSlim {
     public function fillMenuTypeListGridRtc($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $sorguStr = null;
-            if ((isset($params['filterRules']) && $params['filterRules'] != "")) {
-                $filterRules = trim($params['filterRules']);
-                $jsonFilter = json_decode($filterRules, true);
-
-                $sorguExpression = null;
-                foreach ($jsonFilter as $std) {
-                    if ($std['value'] != null) {
-                        switch (trim($std['field'])) {
-                            case 'name':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\' ';
-                                $sorguStr.=" AND name" . $sorguExpression . ' ';
-
-                                break;
-                            case 'name_eng':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\' ';
-                                $sorguStr.=" AND name_eng" . $sorguExpression . ' ';
-
-                                break;
-                            case 'description':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND description" . $sorguExpression . ' ';
-
-                                break;     
-                            case 'description_eng':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND description_eng" . $sorguExpression . ' ';
-                            
-                                break;                             
-                            case 'state_active':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND state_active" . $sorguExpression . ' ';
-                            
-                                break; 
-                            case 'op_user_name':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND op_user_name" . $sorguExpression . ' ';
-                            
-                                break;
-                            case 'language_name':
-                                $sorguExpression = ' ILIKE \'%' . $std['value'] . '%\'  ';
-                                $sorguStr.=" AND language_name" . $sorguExpression . ' ';
-                            
-                                break; 
-                            default:
-                                break;
-                        }
-                    }
-                }
-            } else {
-                $sorguStr = null;
-                $filterRules = "";
-                if (isset($params['name']) && $params['name'] != "") {
-                    $sorguStr .= " AND name Like '%" . $params['name'] . "%'";
-                }
-                if (isset($params['name_eng']) && $params['name_eng'] != "") {
-                    $sorguStr .= " AND name_eng Like '%" . $params['name_eng'] . "%'";
-                }
-                if (isset($params['description']) && $params['description'] != "") {
-                    $sorguStr .= " AND description Like '%" . $params['description'] . "%'";
-                }
-                if (isset($params['description_eng']) && $params['description_eng'] != "") {
-                    $sorguStr .= " AND description_eng Like '%" . $params['description_eng'] . "%'";
-                }           
-                if (isset($params['active']) && $params['active'] != "") {
-                    $sorguStr .= " AND active = " . intval($params['active']) ;
-                }
-                if (isset($params['op_user_name']) && $params['op_user_name'] != "") {
-                    $sorguStr .= " AND op_user_name Like '%" . $params['op_user_name'] . "%'";
-                }            
-                
-            }
-            $sorguStr = rtrim($sorguStr, "AND ");
-            
-            $languageId = NULL;
+ 
+            $languageCode = 'tr';
             $languageIdValue = 647;
-            if ((isset($params['language_code']) && $params['language_code'] != "")) {
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
+            if (isset($params['language_code']) && $params['language_code'] != "") {
+                $languageCode = $params['language_code'];
+            }       
+            $languageCodeParams = array('language_code' => $languageCode,);
+            $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+            $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+            if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                 $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+            }  
+            
+             if (isset($params['fr_name']) && $params['fr_name'] != "") {
+                $sorguStr .= " AND COALESCE(NULLIF(ax.name, ''), a.name_eng) Like '%" . $params['fr_name'] . "%'";
                 }
-            }
+            if (isset($params['f_name_eng']) && $params['f_name_eng'] != "") {
+                $sorguStr .= " AND a.name_eng Like '%" . $params['f_name_eng'] . "%'";
+                }
+            if (isset($params['fr_description']) && $params['fr_description'] != "") {
+                $sorguStr .= " AND COALESCE(NULLIF(ax.description, ''), a.description_eng) Like '%" . $params['fr_description'] . "%'";
+                }
+            if (isset($params['fr_description_eng']) && $params['fr_description_eng'] != "") {
+                $sorguStr .= " AND a.description_eng Like '%" . $params['f_description_eng'] . "%'";
+                }           
+            if (isset($params['active']) && $params['active'] != "") {
+                $sorguStr .= " AND a.active = " . intval($params['active']) ;
+                }
+            if (isset($params['fr_op_user_name']) && $params['fr_op_user_name'] != "") {
+                $sorguStr .= " AND u.username Like '%" . $params['fr_op_user_name'] . "%'";
+                }       
 
             
             $sql = "  
@@ -852,9 +751,11 @@ class SysMenuTypes extends \DAL\DalSlim {
                 LEFT JOIN sys_specific_definitions sd15x ON (sd15x.id = sd15.id OR sd15x.language_parent_id = sd15.id) AND sd15x.language_id =lx.id  AND sd15x.deleted =0 AND sd15x.active =0 
                 LEFT JOIN sys_specific_definitions sd16x ON (sd16x.id = sd16.id OR sd16x.language_parent_id = sd16.id)AND sd16x.language_id = lx.id  AND sd16x.deleted = 0 AND sd16x.active = 0
                 LEFT JOIN sys_menu_types ax ON (ax.id = a.id OR ax.language_parent_id = a.id) AND ax.deleted =0 AND ax.active =0 AND lx.id = ax.language_id                                
-                WHERE a.deleted =0 AND a.language_parent_id =0
-                    ) AS xtable WHERE deleted =0 
-                ".$sorguStr."
+                WHERE 
+                    a.deleted =0 AND 
+                    a.language_parent_id =0
+                    ".$sorguStr."
+                    ) AS xtable                 
                 ) AS xxtable     
                  ";
             $statement = $pdo->prepare($sql);            
